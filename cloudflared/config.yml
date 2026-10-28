@@ -1,0 +1,6 @@
+tunnel: 2305593e-b1e5-42cb-abd6-ef0985413f02
+credentials-file: ./2305593e-b1e5-42cb-abd6-ef0985413f02.json
+ingress:
+  - hostname: ethicaldarkx.gln1.qzz.io
+    service: http://localhost:8000
+  - service: http_status:404

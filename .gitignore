@@ -1,4 +1,2 @@
 node_modules/
 db.json
-cloudflared
-cloudflared-linux-amd64.deb
