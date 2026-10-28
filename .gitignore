@@ -1,0 +1,6 @@
+node_modules/
+.env
+firebase-service-account.json
+db.json
+cloudflared
+cloudflared-linux-amd64.deb

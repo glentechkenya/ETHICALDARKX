@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ETHICAL DARK X — Ethical Hacking Operations</title>
+<meta name="description" content="Offensive-security training, tools, and curriculum for authorized operators.">
+<meta property="og:image" content="https://files.catbox.moe/42szgn.jpg">
+<style>
+:root{--bg:#050507;--line:rgba(255,43,43,.22);--red:#ff2b2b;--green:#29ff7a;--text:#e4e4e9;--muted:#7b7b8a;--panel:rgba(11,11,15,.75)}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+#matrix{position:fixed;inset:0;opacity:.28;pointer-events:none;z-index:0}
+.grid{position:fixed;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(255,43,43,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,43,43,.05) 1px,transparent 1px);background-size:52px 52px;-webkit-mask-image:radial-gradient(circle at 50% 0%,#000 8%,transparent 72%);mask-image:radial-gradient(circle at 50% 0%,#000 8%,transparent 72%)}
+.vig{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,transparent 30%,rgba(0,0,0,.9) 100%)}
+.shell{position:relative;z-index:3}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;background:rgba(5,5,7,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:38px;height:38px;object-fit:cover;border-radius:6px;border:1px solid var(--line);box-shadow:0 0 18px rgba(255,43,43,.45)}
+.brand-name{font-size:14px;letter-spacing:.28em;font-weight:700;color:#fff}
+.brand-name span{color:var(--red)}
+.brand-sub{font-size:9px;letter-spacing:.32em;color:var(--muted);text-transform:uppercase}
+nav{display:flex;gap:16px;font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+nav a{color:var(--muted);transition:color .2s}
+nav a:hover{color:var(--red)}
+.tag{font-size:9px;letter-spacing:.22em;color:var(--green);border:1px solid rgba(41,255,122,.3);padding:6px 10px;border-radius:4px;background:rgba(41,255,122,.06);white-space:nowrap}
+@media(max-width:740px){nav{order:3;width:100%;justify-content:center;padding-top:10px;border-top:1px solid rgba(255,43,43,.1)}.tag{display:none}}
+.hero{padding:90px 22px 50px;text-align:center;position:relative}
+.kicker{display:inline-block;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--red);border:1px solid var(--line);padding:7px 14px;border-radius:3px;background:rgba(255,43,43,.06)}
+.hero h1{margin:26px 0 0;font-size:clamp(2rem,8vw,4.8rem);letter-spacing:.06em;line-height:1;font-weight:800;color:#fff;text-shadow:0 0 26px rgba(255,43,43,.55),0 0 80px rgba(255,43,43,.25)}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero p{max-width:680px;margin:22px auto 0;color:var(--muted);font-size:13.5px;line-height:1.95}
+.cta{margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+section{padding:60px 22px;max-width:1150px;margin:0 auto}
+h2{font-size:clamp(1.15rem,3vw,1.55rem);letter-spacing:.26em;text-transform:uppercase;color:#fff;margin:0 0 8px}
+h2::before{content:"// ";color:var(--red)}
+.sub{color:var(--muted);font-size:12.5px;letter-spacing:.06em;margin:0 0 32px;line-height:1.8;max-width:760px}
+.expertise-grid{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:780px){.expertise-grid{grid-template-columns:repeat(3,1fr)}}
+.exp-card{border:1px solid var(--line);padding:26px;border-radius:10px;background:var(--panel);transition:.25s;position:relative;overflow:hidden}
+.exp-card::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.85}
+.exp-card:hover{border-color:rgba(255,43,43,.5);box-shadow:0 0 40px rgba(255,43,43,.12);transform:translateY(-3px)}
+.exp-card h3{margin:0 0 14px;color:var(--red);font-size:13px;letter-spacing:.16em;text-transform:uppercase}
+.exp-card p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.9}
+.lab-grid{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:780px){.lab-grid{grid-template-columns:1fr 1fr}}
+.lesson{border:1px solid var(--line);padding:24px;border-radius:10px;background:var(--panel);transition:.25s}
+.lesson:hover{border-color:rgba(255,43,43,.4)}
+.lesson-cat{font-size:9px;color:var(--green);letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px}
+.lesson h3{margin:0 0 10px;color:#fff;font-size:14px}
+.lesson p{margin:0;color:var(--muted);font-size:12px;line-height:1.85}
+.lesson details{margin-top:14px}
+.lesson summary{color:var(--red);font-size:10px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;list-style:none}
+.lesson summary::-webkit-details-marker{display:none}
+.lesson summary::before{content:"▸ "}
+.lesson details[open] summary::before{content:"▾ "}
+.lesson-content{color:#c8c8d0;font-size:11.5px;line-height:1.9;margin-top:12px;white-space:pre-wrap;padding-top:12px;border-top:1px dashed rgba(255,43,43,.15)}
+.projects{display:grid;grid-template-columns:1fr;gap:24px}
+@media(min-width:900px){.projects{grid-template-columns:1fr 1fr}}
+.card{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 0 22px;transition:.3s;display:flex;flex-direction:column}
+.card::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.85;z-index:2}
+.card:hover{transform:translateY(-5px);border-color:rgba(255,43,43,.5);box-shadow:0 28px 70px rgba(255,43,43,.16)}
+.card-img{width:100%;height:200px;object-fit:cover;border-bottom:1px solid var(--line);display:block}
+.card-body{padding:22px 24px 0}
+.card-type{font-size:9px;letter-spacing:.28em;color:var(--red);text-transform:uppercase;margin-bottom:10px}
+.card h3{margin:0 0 12px;font-size:1.15rem;color:#fff;line-height:1.35}
+.card p{margin:0 0 16px;color:var(--muted);font-size:12.5px;line-height:1.85}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.tag-i{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);border:1px solid rgba(41,255,122,.28);background:rgba(41,255,122,.05);padding:4px 9px;border-radius:3px}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px 0;border-top:1px dashed rgba(255,43,43,.18);margin-top:auto}
+.price{font-size:1.15rem;color:#fff;font-weight:700}
+.price small{color:var(--muted);font-size:9px;letter-spacing:.22em;display:block;margin-top:3px;font-weight:400}
+.btn{cursor:pointer;border:1px solid var(--red);background:rgba(255,43,43,.1);color:#ff6060;padding:11px 20px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;border-radius:4px;transition:.2s;font-family:inherit;white-space:nowrap}
+.btn:hover{background:var(--red);color:#0a0a0a;box-shadow:0 0 28px rgba(255,43,43,.5)}
+.btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn-ghost{background:transparent;border-color:rgba(255,43,43,.3);color:var(--muted)}
+.btn-ghost:hover{background:rgba(255,43,43,.1);color:#ff6060;box-shadow:none}
+.contact-form{display:grid;gap:12px;max-width:680px}
+.contact-form input,.contact-form textarea{background:#0d0d13;border:1px solid rgba(255,255,255,.1);color:var(--text);padding:12px 14px;font-family:inherit;font-size:12.5px;border-radius:4px;outline:none;transition:.2s}
+.contact-form input:focus,.contact-form textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,43,43,.1)}
+.contact-form textarea{resize:vertical;min-height:120px}
+.form-msg{font-size:11px;letter-spacing:.08em;margin:6px 0 0}
+.loading{color:var(--muted);font-size:11px;letter-spacing:.2em;padding:40px 0;text-align:center}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:50px 24px;text-align:center;color:var(--muted);font-size:11px;letter-spacing:.2em}
+footer{border-top:1px solid var(--line);background:rgba(5,5,7,.92);padding:50px 22px 40px;margin-top:60px}
+.fi{max-width:1150px;margin:0 auto}
+.fg{display:grid;grid-template-columns:1fr;gap:32px}
+@media(min-width:780px){.fg{grid-template-columns:1.4fr 1fr}}
+footer h4{margin:0 0 14px;font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--red)}
+footer p{margin:0 0 10px;font-size:11.5px;line-height:1.9;color:var(--muted)}
+footer a{color:var(--green)}footer a:hover{text-decoration:underline}
+.disc{margin-top:34px;padding:16px 18px;border-left:2px solid var(--red);background:rgba(255,43,43,.05);border-radius:0 6px 6px 0;font-size:11px;line-height:1.9;color:#9a9aa8}
+.copy{margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,43,43,.12);font-size:10px;letter-spacing:.2em;color:#4d4d5a;text-transform:uppercase;text-align:center;position:relative}
+.admin-dot{display:inline-block;width:10px;height:10px;margin-left:8px;vertical-align:middle;opacity:0;transition:opacity .25s;text-decoration:none;cursor:pointer}
+.copy:hover .admin-dot{opacity:.6}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="grid"></div>
+<div class="vig"></div>
+
+<div class="shell">
+  <header>
+    <div class="brand">
+      <img src="https://files.catbox.moe/42szgn.jpg" alt="Ethical Dark X">
+      <div>
+        <div class="brand-name">ETHICAL DARK <span>X</span></div>
+        <div class="brand-sub">Offensive Security Division</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#expertise">Expertise</a>
+      <a href="#lab">Learning Lab</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="tag">Authorized Testing Only</div>
+  </header>
+
+  <section class="hero">
+    <span class="kicker">Encrypted Channel Established</span>
+    <h1>ETHICAL <em>DARK</em> X</h1>
+    <p>ETHICAL DARK X is a training and tooling division for operators who work inside the legal boundaries of offensive security. We publish field-tested modules, structured courses, and hardened toolkits covering reconnaissance, web exploitation, network pivoting, and adversary simulation. Every product is delivered on payment confirmation and supported by a direct operator channel.</p>
+    <div class="cta">
+      <a href="#projects" class="btn">Browse Marketplace</a>
+      <a href="#lab" class="btn btn-ghost">Enter Learning Lab</a>
+    </div>
+  </section>
+
+  <section id="expertise">
+    <h2>Cybersecurity Expertise</h2>
+    <p class="sub">Three disciplines. One objective — hardening systems and operators against realistic threats.</p>
+    <div class="expertise-grid">
+      <div class="exp-card">
+        <h3>Offensive Security</h3>
+        <p>Full-scope penetration testing and red-team operations. Web application exploitation, network pivoting, Active Directory attack paths, and cloud misconfiguration abuse. Delivered as reproducible playbooks — not theory.</p>
+      </div>
+      <div class="exp-card">
+        <h3>Defensive Operations</h3>
+        <p>Threat detection engineering, incident response runbooks, and SOC workflows. We build detection rules that catch real attacker behaviour, not just signatures — and we test them against the same tools attackers use.</p>
+      </div>
+      <div class="exp-card">
+        <h3>Security Education</h3>
+        <p>Hands-on labs and structured learning paths, from beginner reconnaissance to advanced adversary operations. Every lesson is designed to be run inside a legal, isolated environment.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="lab">
+    <h2>Learning Lab</h2>
+    <p class="sub">Free educational content. Authorized testing only — everything here assumes a lab you own or have written permission to test.</p>
+    <div class="lab-grid" id="labList"><div class="loading">LOADING LESSONS…</div></div>
+  </section>
+
+  <section id="projects">
+    <h2>Projects Marketplace</h2>
+    <p class="sub">Modules, courses, and toolkits. Each purchase is a one-time fee in Nigerian Naira, verified by Paystack before delivery.</p>
+    <div class="projects" id="list"><div class="loading">LOADING MODULES…</div></div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p class="sub">Direct line to the operators. Use this for questions about a purchase, custom engagements, or training enquiries.</p>
+    <form class="contact-form" id="contactForm">
+      <input name="name" placeholder="Your name" required>
+      <input name="email" type="email" placeholder="Email address" required>
+      <input name="subject" placeholder="Subject (optional)">
+      <textarea name="message" placeholder="Message" required></textarea>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <button type="submit" class="btn" id="sendBtn">Transmit</button>
+        <span class="form-msg" id="contactMsg"></span>
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    <div class="fi">
+      <div class="fg">
+        <div>
+          <h4>Operators</h4>
+          <p>glentechkenya — <a href="tel:+254797109572">+254 797 109 572</a></p>
+          <p>Ethical X — <a href="tel:+2348053450957">+234 805 345 0957</a></p>
+        </div>
+        <div>
+          <h4>Protocol</h4>
+          <p>Payments processed in Nigerian Shillings via Paystack.</p>
+          <p>Access delivered after payment confirmation.</p>
+          <p>All modules are for authorized security testing only.</p>
+        </div>
+      </div>
+      <div class="disc"><strong>DISCLAIMER —</strong> ETHICAL DARK X provides offensive-security education and tooling exclusively for authorized penetration testing, red-team engagements, and defensive research. Every technique, payload, or methodology distributed here must be used only against systems you own or have explicit written permission to test. We do not condone, support, or facilitate unauthorized access, data theft, or any activity that violates applicable law. You are solely responsible for how you apply this knowledge.</div>
+      <div class="copy">
+        © <span id="yr"></span> ETHICAL DARK X — ALL RIGHTS RESERVED
+        <a href="/admin" class="admin-dot" title="" aria-label=".">▪</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+(function(){
+  var c=document.getElementById('matrix'),x=c.getContext('2d'),d,s=15;
+  function r(){c.width=innerWidth;c.height=innerHeight;var n=Math.ceil(c.width/s);d=[];for(var i=0;i<n;i++)d[i]=Math.random()*-80}
+  function f(){x.fillStyle='rgba(5,5,7,0.09)';x.fillRect(0,0,c.width,c.height);x.font=s+'px monospace';
+    for(var i=0;i<d.length;i++){x.fillStyle=Math.random()<.08?'#ff2b2b':'#29ff7a';x.fillText(Math.random()<.5?'0':'1',i*s,d[i]*s);
+      if(d[i]*s>c.height&&Math.random()>.975)d[i]=0;d[i]++}requestAnimationFrame(f)}
+  r();f();addEventListener('resize',r);
+})();
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+function priceOf(p){return Number(p.priceNGN != null ? p.priceNGN : (p.price || 0))}
+
+async function loadProjects(){
+  var el=document.getElementById('list');
+  try{
+    var r=await fetch('/api/projects'),d=await r.json();
+    if(!d.projects||!d.projects.length){el.innerHTML='<div class="empty">NO MODULES RELEASED AT THIS TIME</div>';return}
+    el.innerHTML=d.projects.map(function(p){
+      var img=p.image||p.coverImage||'';
+      return '<article class="card">'
+        +(img?'<img class="card-img" src="'+esc(img)+'" alt="'+esc(p.title)+'" loading="lazy" onerror="this.style.display=\'none\'">':'')
+        +'<div class="card-body">'
+        +'<div class="card-type">'+esc(p.type||p.category||'module')+'</div>'
+        +'<h3>'+esc(p.title)+'</h3>'
+        +'<p>'+esc(p.longDescription||p.description||'')+'</p>'
+        +'<div class="tags">'+(p.tags||p.technologies||[]).map(function(t){return '<span class="tag-i">'+esc(t)+'</span>'}).join('')+'</div>'
+        +'</div>'
+        +'<div class="foot"><div class="price">₦'+priceOf(p).toLocaleString('en-NG')+'<small>One-time access</small></div>'
+        +'<button class="btn" data-id="'+p.id+'">Acquire</button></div>'
+        +'</article>';
+    }).join('');
+    el.querySelectorAll('button[data-id]').forEach(function(b){b.addEventListener('click',function(){pay(b.dataset.id,b)})});
+  }catch(e){el.innerHTML='<div class="empty">ERROR LOADING MODULES</div>'}
+}
+
+async function loadLessons(){
+  var el=document.getElementById('labList');
+  try{
+    var r=await fetch('/api/lessons'),d=await r.json();
+    if(!d.lessons||!d.lessons.length){el.innerHTML='<div class="empty">NO LESSONS PUBLISHED YET</div>';return}
+    el.innerHTML=d.lessons.map(function(l){
+      return '<article class="lesson">'
+        +'<div class="lesson-cat">'+esc(l.category||'General')+'</div>'
+        +'<h3>'+esc(l.title)+'</h3>'
+        +'<p>'+esc(l.description)+'</p>'
+        +(l.content?'<details><summary>Read Lesson</summary><div class="lesson-content">'+esc(l.content)+'</div></details>':'')
+        +'</article>';
+    }).join('');
+  }catch(e){el.innerHTML='<div class="empty">ERROR LOADING LESSONS</div>'}
+}
+
+async function pay(projectId,btn){
+  var email=prompt('Enter your email for delivery:');
+  if(!email)return;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Enter a valid email address');return}
+  btn.disabled=true;var orig=btn.textContent;btn.textContent='Connecting…';
+  try{
+    var r=await fetch('/api/pay/initialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({projectId:projectId,email:email})});
+    var d=await r.json();
+    if(d.authorizationUrl){window.location.href=d.authorizationUrl}
+    else throw new Error(d.error||'Payment could not start');
+  }catch(e){alert(e.message);btn.disabled=false;btn.textContent=orig}
+}
+
+document.getElementById('contactForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var f=e.target,btn=document.getElementById('sendBtn'),msg=document.getElementById('contactMsg');
+  var body={name:f.name.value.trim(),email:f.email.value.trim(),subject:f.subject.value.trim(),message:f.message.value.trim()};
+  btn.disabled=true;btn.textContent='Transmitting…';msg.textContent='';msg.style.color='var(--muted)';
+  try{
+    var r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.ok){msg.textContent='MESSAGE RECEIVED — OPERATOR WILL RESPOND.';msg.style.color='var(--green)';f.reset()}
+    else{var d=await r.json();throw new Error(d.error||'Failed to send')}
+  }catch(err){msg.textContent=err.message;msg.style.color='var(--red)'}
+  finally{btn.disabled=false;btn.textContent='Transmit'}
+});
+
+loadProjects();
+loadLessons();
+</script>
+</body>
+</html>

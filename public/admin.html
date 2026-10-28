@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Control Panel — ETHICAL DARK X</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{--bg:#050507;--line:rgba(255,43,43,.22);--red:#ff2b2b;--green:#29ff7a;--text:#e4e4e9;--muted:#7b7b8a;--panel:rgba(11,11,15,.7)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;min-height:100vh;padding:26px 20px}
+.wrap{max-width:1020px;margin:0 auto}
+h1{color:#fff;font-size:1rem;letter-spacing:.3em;margin:0;font-weight:700}
+h1::before{content:"// ";color:var(--red)}
+h2{color:#fff;font-size:.85rem;letter-spacing:.25em;margin:36px 0 14px;text-transform:uppercase}
+h2::before{content:"// ";color:var(--red)}
+.login{max-width:400px;margin:100px auto;border:1px solid var(--line);padding:32px 28px;border-radius:10px;background:var(--panel)}
+input,textarea,select{width:100%;background:#0d0d13;border:1px solid rgba(255,255,255,.1);color:var(--text);padding:10px 12px;margin:6px 0;font-family:inherit;border-radius:4px;font-size:12.5px;outline:none;transition:.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,43,43,.1)}
+textarea{min-height:80px;resize:vertical;line-height:1.7}
+.btn{background:rgba(255,43,43,.1);border:1px solid var(--red);color:#ff6060;padding:10px 18px;font-size:10px;letter-spacing:.22em;cursor:pointer;text-transform:uppercase;font-family:inherit;border-radius:4px;transition:.2s}
+.btn:hover{background:var(--red);color:#0a0a0a}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--muted)}
+.btn-ghost:hover{background:rgba(255,43,43,.1);color:#ff6060}
+.row{border:1px solid var(--line);border-radius:8px;padding:18px;margin:12px 0;background:var(--panel)}
+.row-new{border-color:rgba(41,255,122,.28);background:rgba(41,255,122,.03)}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+.err{color:#ff6060;font-size:11px;margin:8px 0;letter-spacing:.06em}
+.flash{color:var(--green);font-size:10px;letter-spacing:.2em}
+.checkline{display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-top:8px}
+.checkline input{width:auto;margin:0}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:36px;text-align:center;color:var(--muted);font-size:10.5px;letter-spacing:.2em}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:20px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:16px;background:var(--panel);text-align:center}
+.stat b{display:block;font-size:1.5rem;color:#fff;margin-bottom:4px}
+.stat span{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.stat.hot b{color:var(--red)}
+.msg-head{font-size:10.5px;color:var(--red);letter-spacing:.1em}
+.msg-sub{font-size:11px;color:#fff;margin:4px 0}
+.msg-body{font-size:11.5px;color:var(--muted);line-height:1.75;white-space:pre-wrap;margin-top:10px}
+.msg-row.read{opacity:.55}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:24px 0 8px;border-bottom:1px solid var(--line);padding-bottom:0}
+.tab{padding:10px 16px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--red);border-bottom-color:var(--red)}
+.panel{display:none}.panel.active{display:block}
+.field-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:10px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+var app = document.getElementById('app');
+var state = { projects: [], lessons: [], messages: [], purchases: [], tab: 'projects' };
+var flashTimer;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function flash(msg){var el=document.getElementById('flash');if(!el)return;el.textContent=msg;clearTimeout(flashTimer);flashTimer=setTimeout(function(){el.textContent=''},1800)}
+function priceOf(p){return Number(p.priceNGN != null ? p.priceNGN : (p.price || 0))}
+
+async function boot(){
+  var r=await fetch('/api/admin/check'),d=await r.json();
+  if(d.authenticated) loadAll();
+  else renderLogin();
+}
+
+function renderLogin(errMsg){
+  app.innerHTML='<div class="login"><h1>Restricted Access</h1>'
+    +'<p style="color:#7b7b8a;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin:8px 0 20px">Operator credentials required</p>'
+    +'<input id="lemail" type="email" placeholder="Email" autocomplete="username">'
+    +'<input id="lpw" type="password" placeholder="Password" autocomplete="current-password">'
+    +'<p class="err" id="lerr">'+esc(errMsg||'')+'</p>'
+    +'<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="btn" onclick="doLogin()">Authenticate</button></div></div>';
+}
+
+async function doLogin(){
+  var err=document.getElementById('lerr');err.textContent='';
+  try{
+    var r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('lemail').value.trim(),password:document.getElementById('lpw').value})});
+    if(r.ok){await loadAll()}
+    else{var d=await r.json();err.textContent=d.error||'Access denied'}
+  }catch(e){err.textContent=e.message}
+}
+
+async function loadAll(){
+  try{
+    var p1=await fetch('/api/admin/projects');
+    if(p1.status===401){renderLogin('Session expired');return}
+    var p2=await fetch('/api/admin/lessons');
+    var p3=await fetch('/api/admin/messages');
+    var p4=await fetch('/api/admin/purchases');
+    state.projects=(await p1.json()).projects||[];
+    state.lessons=(await p2.json()).lessons||[];
+    state.messages=(await p3.json()).messages||[];
+    state.purchases=(await p4.json()).purchases||[];
+    render();
+  }catch(e){app.innerHTML='<p class="err">Load failed: '+esc(e.message)+'</p>'}
+}
+
+function setTab(t){state.tab=t;render()}
+
+function render(){
+  var unread=state.messages.filter(function(m){return !m.read}).length;
+  var released=state.projects.filter(function(p){return p.released||p.status==='Released'||p.published}).length;
+  var revenue=state.purchases.reduce(function(a,b){return a+Number(b.amountNGN||b.amount||0)},0);
+
+  var html='<div class="topbar"><h1>Control Panel</h1>'
+    +'<div style="display:flex;gap:10px;align-items:center"><span id="flash" class="flash"></span>'
+    +'<button class="btn btn-ghost" onclick="logout()">Logout</button></div></div>';
+
+  html+='<div class="stats">'
+    +'<div class="stat"><b>'+state.projects.length+'</b><span>Projects</span></div>'
+    +'<div class="stat"><b>'+released+'</b><span>Published</span></div>'
+    +'<div class="stat"><b>'+state.lessons.length+'</b><span>Lessons</span></div>'
+    +'<div class="stat hot"><b>'+unread+'</b><span>Unread Msg</span></div>'
+    +'<div class="stat"><b>₦'+revenue.toLocaleString('en-NG')+'</b><span>Revenue</span></div>'
+    +'</div>';
+
+  html+='<div class="tabs">'
+    +'<div class="tab '+(state.tab==='projects'?'active':'')+'" onclick="setTab(\'projects\')">Projects</div>'
+    +'<div class="tab '+(state.tab==='lessons'?'active':'')+'" onclick="setTab(\'lessons\')">Lessons</div>'
+    +'<div class="tab '+(state.tab==='messages'?'active':'')+'" onclick="setTab(\'messages\')">Messages</div>'
+    +'<div class="tab '+(state.tab==='purchases'?'active':'')+'" onclick="setTab(\'purchases\')">Purchases</div>'
+    +'</div>';
+
+  html+='<div class="panel '+(state.tab==='projects'?'active':'')+'">'+renderProjects()+'</div>';
+  html+='<div class="panel '+(state.tab==='lessons'?'active':'')+'">'+renderLessons()+'</div>';
+  html+='<div class="panel '+(state.tab==='messages'?'active':'')+'">'+renderMessages()+'</div>';
+  html+='<div class="panel '+(state.tab==='purchases'?'active':'')+'">'+renderPurchases()+'</div>';
+
+  app.innerHTML=html;
+}
+
+function renderProjects(){
+  var h='<h2>New Project</h2><div class="row row-new">'
+    +'<input id="nt" placeholder="Title" required>'
+    +'<textarea id="nd" placeholder="Short description (shown on card)"></textarea>'
+    +'<textarea id="nld" placeholder="Long description (shown instead of short if provided)"></textarea>'
+    +'<input id="np" type="number" placeholder="Price (NGN)" min="0">'
+    +'<input id="nimg" placeholder="Image URL (https://...)">'
+    +'<input id="ntags" placeholder="Tags (comma separated)">'
+    +'<select id="ntype"><option value="module">Module</option><option value="course">Course</option><option value="toolkit">Toolkit</option></select>'
+    +'<label class="checkline"><input type="checkbox" id="nr"> Release immediately</label>'
+    +'<div class="actions"><button class="btn" onclick="createProject()">Create Project</button></div></div>';
+  h+='<h2>Projects ('+state.projects.length+')</h2>';
+  if(!state.projects.length) return h+'<div class="empty">NO PROJECTS YET</div>';
+  h+=state.projects.map(function(p){
+    var rel = p.released===true || p.status==='Released' || p.published===true;
+    return '<div class="row">'
+      +'<input value="'+esc(p.title)+'" onchange="updProject(\''+p.id+'\',\'title\',this.value)" placeholder="Title">'
+      +'<textarea onchange="updProject(\''+p.id+'\',\'description\',this.value)" placeholder="Short description">'+esc(p.description||'')+'</textarea>'
+      +'<textarea onchange="updProject(\''+p.id+'\',\'longDescription\',this.value)" placeholder="Long description">'+esc(p.longDescription||'')+'</textarea>'
+      +'<input type="number" value="'+priceOf(p)+'" min="0" onchange="updProject(\''+p.id+'\',\'price\',this.value)" placeholder="Price (NGN)">'
+      +'<input value="'+esc(p.image||p.coverImage||'')+'" onchange="updProject(\''+p.id+'\',\'image\',this.value)" placeholder="Image URL">'
+      +'<input value="'+esc((p.tags||p.technologies||[]).join(', '))+'" onchange="updProject(\''+p.id+'\',\'tags\',this.value)" placeholder="Tags">'
+      +'<select onchange="updProject(\''+p.id+'\',\'type\',this.value)">'
+      +'<option value="module"'+((p.type||p.category||'module')==='module'?' selected':'')+'>Module</option>'
+      +'<option value="course"'+(p.type==='course'?' selected':'')+'>Course</option>'
+      +'<option value="toolkit"'+(p.type==='toolkit'?' selected':'')+'>Toolkit</option></select>'
+      +'<label class="checkline"><input type="checkbox" '+(rel?'checked':'')+' onchange="updProject(\''+p.id+'\',\'released\',this.checked)"> '+(rel?'Published':'Draft')+'</label>'
+      +'<div class="actions"><button class="btn btn-ghost" onclick="delProject(\''+p.id+'\')">Delete</button></div>'
+      +'</div>';
+  }).join('');
+  return h;
+}
+
+function renderLessons(){
+  var h='<h2>New Lesson</h2><div class="row row-new">'
+    +'<input id="lt" placeholder="Lesson title">'
+    +'<input id="lcat" placeholder="Category (e.g. Recon)">'
+    +'<textarea id="ld" placeholder="Short description"></textarea>'
+    +'<textarea id="lc" placeholder="Full lesson content"></textarea>'
+    +'<label class="checkline"><input type="checkbox" id="lr"> Publish immediately</label>'
+    +'<div class="actions"><button class="btn" onclick="createLesson()">Create Lesson</button></div></div>';
+  h+='<h2>Lessons ('+state.lessons.length+')</h2>';
+  if(!state.lessons.length) return h+'<div class="empty">NO LESSONS YET</div>';
+  h+=state.lessons.map(function(l){
+    return '<div class="row">'
+      +'<input value="'+esc(l.title)+'" onchange="updLesson(\''+l.id+'\',\'title\',this.value)" placeholder="Title">'
+      +'<input value="'+esc(l.category||'')+'" onchange="updLesson(\''+l.id+'\',\'category\',this.value)" placeholder="Category">'
+      +'<textarea onchange="updLesson(\''+l.id+'\',\'description\',this.value)" placeholder="Description">'+esc(l.description||'')+'</textarea>'
+      +'<textarea onchange="updLesson(\''+l.id+'\',\'content\',this.value)" placeholder="Content">'+esc(l.content||'')+'</textarea>'
+      +'<label class="checkline"><input type="checkbox" '+(l.released?'checked':'')+' onchange="updLesson(\''+l.id+'\',\'released\',this.checked)"> '+(l.released?'Published':'Draft')+'</label>'
+      +'<div class="actions"><button class="btn btn-ghost" onclick="delLesson(\''+l.id+'\')">Delete</button></div>'
+      +'</div>';
+  }).join('');
+  return h;
+}
+
+function renderMessages(){
+  var unread=state.messages.filter(function(m){return !m.read}).length;
+  var h='<h2>Messages ('+unread+' unread / '+state.messages.length+' total)</h2>';
+  if(!state.messages.length) return h+'<div class="empty">INBOX EMPTY</div>';
+  h+=state.messages.map(function(m){
+    return '<div class="row '+(m.read?'msg-row read':'')+'">'
+      +'<div class="msg-head">'+esc(m.name)+' &lt;'+esc(m.email)+'&gt;</div>'
+      +(m.subject?'<div class="msg-sub">'+esc(m.subject)+'</div>':'')
+      +'<div class="msg-body">'+esc(m.message)+'</div>'
+      +'<div class="actions">'
+      +'<button class="btn btn-ghost" onclick="toggleRead(\''+m.id+'\','+(!m.read)+')">'+(m.read?'Mark unread':'Mark read')+'</button>'
+      +'<button class="btn btn-ghost" onclick="delMessage(\''+m.id+'\')">Delete</button>'
+      +'</div></div>';
+  }).join('');
+  return h;
+}
+
+function renderPurchases(){
+  var h='<h2>Purchases ('+state.purchases.length+')</h2>';
+  if(!state.purchases.length) return h+'<div class="empty">NO PURCHASES YET</div>';
+  h+=state.purchases.map(function(p){
+    return '<div class="row">'
+      +'<div class="msg-head">REF: '+esc(p.reference||p.id||'—')+'</div>'
+      +'<div class="msg-sub">'+esc(p.projectTitle||'Unknown project')+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:8px">'
+      +'Email: '+esc(p.email||'—')+'<br>'
+      +'Amount: ₦'+Number(p.amountNGN||p.amount||0).toLocaleString('en-NG')+'<br>'
+      +'Paid: '+(p.paidAt&&p.paidAt._seconds?new Date(p.paidAt._seconds*1000).toLocaleString():'—')
+      +'</div></div>';
+  }).join('');
+  return h;
+}
+
+async function createProject(){
+  var tags=document.getElementById('ntags').value.split(',').map(function(t){return t.trim()}).filter(Boolean);
+  var price=Number(document.getElementById('np').value)||0;
+  try{
+    var r=await fetch('/api/admin/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      title:document.getElementById('nt').value,
+      description:document.getElementById('nd').value,
+      longDescription:document.getElementById('nld').value,
+      priceNGN:price,
+      price:price,
+      image:document.getElementById('nimg').value,
+      tags:tags,
+      technologies:tags,
+      type:document.getElementById('ntype').value,
+      category:document.getElementById('ntype').value,
+      released:document.getElementById('nr').checked
+    })});
+    if(!r.ok){var d=await r.json();throw new Error(d.error||'Failed')}
+    await loadAll();flash('Project created.');
+  }catch(e){alert(e.message)}
+}
+
+async function updProject(id,field,value){
+  var body={};body[field]=value;
+  if(field==='tags'){ body.tags=String(value).split(',').map(function(t){return t.trim()}).filter(Boolean); body.technologies=body.tags; }
+  else if(field==='price'||field==='priceNGN'){ var n=Number(value)||0; body.price=n; body.priceNGN=n; }
+  try{
+    var r=await fetch('/api/admin/projects/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok){var d=await r.json();throw new Error(d.error||'Failed')}
+    flash('Saved.');
+  }catch(e){alert(e.message)}
+}
+
+async function delProject(id){
+  if(!confirm('Delete project permanently?'))return;
+  try{await fetch('/api/admin/projects/'+id,{method:'DELETE'});await loadAll();flash('Deleted.')}catch(e){alert(e.message)}
+}
+
+async function createLesson(){
+  try{
+    var r=await fetch('/api/admin/lessons',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:document.getElementById('lt').value,category:document.getElementById('lcat').value,description:document.getElementById('ld').value,content:document.getElementById('lc').value,released:document.getElementById('lr').checked})});
+    if(!r.ok){var d=await r.json();throw new Error(d.error||'Failed')}
+    await loadAll();flash('Lesson created.');
+  }catch(e){alert(e.message)}
+}
+
+async function updLesson(id,field,value){
+  var body={};body[field]=value;
+  try{
+    var r=await fetch('/api/admin/lessons/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok){var d=await r.json();throw new Error(d.error||'Failed')}
+    flash('Saved.');
+  }catch(e){alert(e.message)}
+}
+
+async function delLesson(id){
+  if(!confirm('Delete lesson permanently?'))return;
+  try{await fetch('/api/admin/lessons/'+id,{method:'DELETE'});await loadAll();flash('Deleted.')}catch(e){alert(e.message)}
+}
+
+async function toggleRead(id,read){
+  try{await fetch('/api/admin/messages/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({read:read})});await loadAll()}catch(e){alert(e.message)}
+}
+
+async function delMessage(id){
+  if(!confirm('Delete message?'))return;
+  try{await fetch('/api/admin/messages/'+id,{method:'DELETE'});await loadAll();flash('Deleted.')}catch(e){alert(e.message)}
+}
+
+async function logout(){
+  await fetch('/api/admin/logout',{method:'POST'});
+  renderLogin();
+}
+
+boot();
+</script>
+</body>
+</html>
